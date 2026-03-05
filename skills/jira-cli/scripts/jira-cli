@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BIN_DIR="${SCRIPT_DIR}/bin"
+
+OS="$(uname -s)"
+ARCH="$(uname -m)"
+
+select_binary() {
+  case "${OS}:${ARCH}" in
+    Darwin:arm64)
+      echo "${BIN_DIR}/jira-cli-darwin-arm64"
+      ;;
+    Linux:x86_64)
+      echo "${BIN_DIR}/jira-cli-linux-x86_64"
+      ;;
+    *)
+      echo ""
+      ;;
+  esac
+}
+
+BIN_PATH="$(select_binary)"
+
+if [[ -n "${BIN_PATH}" && -x "${BIN_PATH}" ]]; then
+  exec "${BIN_PATH}" "$@"
+fi
+
+# Source fallback when repo and Cargo are available.
+REPO_ROOT="$(cd "${SCRIPT_DIR}/../../.." && pwd)"
+if [[ -f "${REPO_ROOT}/Cargo.toml" ]] && command -v cargo >/dev/null 2>&1; then
+  exec cargo run --release --manifest-path "${REPO_ROOT}/Cargo.toml" -- "$@"
+fi
+
+cat >&2 <<MSG
+No compatible prebuilt jira-cli binary found for ${OS}/${ARCH}.
+Expected one of:
+  - ${BIN_DIR}/jira-cli-darwin-arm64
+  - ${BIN_DIR}/jira-cli-linux-x86_64
+
+Fallback source build is unavailable (Cargo not found or source tree missing).
+Install Rust+Cargo or use a supported prebuilt artifact.
+MSG
+exit 5

@@ -1,0 +1,11 @@
+config_version = 1
+
+# Base URL of your Jira Server / Data Center instance (no trailing slash)
+base_url = "https://jira.mycompany.com"
+
+# Name of the environment variable that holds your Personal Access Token (PAT).
+# Never store the actual token here — only the env var name.
+token_env = "JIRA_API_TOKEN"
+
+# HTTP request timeout in milliseconds (default: 30000)
+request_timeout_ms = 30000
