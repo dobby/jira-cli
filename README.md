@@ -9,83 +9,48 @@ Targets Jira Server / Data Center via REST API v2 with:
 - PAT-based auth via env var reference (never plaintext)
 - Dual-platform skill launcher support (macOS arm64, Linux x86_64)
 
-## Quick usage
+## Install
 
 ```bash
-scripts/jira-cli --project-root /path/to/repo config validate
+npx skills add dobby/jira-cli
 ```
 
-```bash
-scripts/jira-cli --project-root /path/to/repo get-issue PROJ-123
-```
-
-```bash
-scripts/jira-cli --project-root /path/to/repo search --jql "project = PROJ AND status = 'In Progress'" --max-results 10
-```
-
-## Installing the skill
-
-### 1. Copy the skill to your Claude skills directory
-
-```bash
-cp -r skills/jira-cli ~/.claude/skills/jira-cli
-```
-
-The skill will be available to Claude Code in all projects immediately.
-
-### 2. Set up a project
-
-In any project where you want to use jira-cli, copy the launcher script and binary:
-
-```bash
-mkdir -p scripts/bin
-cp skills/jira-cli/scripts/jira-cli scripts/jira-cli
-cp skills/jira-cli/scripts/bin/jira-cli-darwin-arm64 scripts/bin/   # macOS arm64
-cp skills/jira-cli/scripts/bin/jira-cli-linux-x86_64 scripts/bin/   # Linux x86_64
-chmod +x scripts/jira-cli scripts/bin/jira-cli-*
-```
-
-### 3. Create config
+Then configure your project (see [skills/jira-cli/references/SETUP.md](skills/jira-cli/references/SETUP.md)):
 
 ```bash
 mkdir -p .agents/jira-cli
 cp skills/jira-cli/references/jira.toml.example .agents/jira-cli/jira.toml
-```
-
-Edit `.agents/jira-cli/jira.toml`:
-
-```toml
-config_version = 1
-base_url = "https://jira.mycompany.com"
-token_env = "JIRA_API_TOKEN"
-request_timeout_ms = 30000
-```
-
-### 4. Set your Personal Access Token
-
-Create `.agents/jira-cli/.env` (never commit this):
-
-```bash
+# edit jira.toml: set base_url to your Jira instance
 echo 'JIRA_API_TOKEN=your-pat-here' > .agents/jira-cli/.env
 ```
 
-Add to `.gitignore`:
-
-```
-.agents/jira-cli/.env
-```
-
-### 5. Validate
+Validate:
 
 ```bash
-scripts/jira-cli --project-root . config validate
+skills/jira-cli/scripts/jira-cli --project-root . config validate
 ```
 
-See [skills/jira-cli/references/SETUP.md](skills/jira-cli/references/SETUP.md) for the full setup guide including how to generate a PAT and troubleshooting steps.
+## Quick usage
+
+```bash
+skills/jira-cli/scripts/jira-cli --project-root /path/to/repo get-issue PROJ-123
+```
+
+```bash
+skills/jira-cli/scripts/jira-cli --project-root /path/to/repo search --jql "project = PROJ AND status = 'In Progress'" --max-results 10
+```
+
+```bash
+skills/jira-cli/scripts/jira-cli --project-root /path/to/repo create-issue --project PROJ --type Bug --title "Login fails on Safari" --priority High
+```
+
+```bash
+skills/jira-cli/scripts/jira-cli --project-root /path/to/repo transition PROJ-123 --status-name "In Progress"
+```
 
 ## Agent safety
 
-- Agents must use `scripts/jira-cli` for all Jira interactions.
+- Agents must use `skills/jira-cli/scripts/jira-cli` for all Jira interactions.
 - Agents must not call the Jira API directly (curl, fetch, etc.).
 - Agents must not read `.agents/jira-cli/jira.toml` or `.env` files directly.
 
