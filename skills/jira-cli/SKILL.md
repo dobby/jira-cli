@@ -1,8 +1,10 @@
 ---
 name: jira-cli
 version: 0.1.0
-description: Interact with Jira Server/Data Center — read issues, create/update issues,
-  transition status, link issues, and manage comments via a safe CLI wrapper.
+description: Use this whenever the user asks about Jira, Jira tickets, issue keys
+  like MCD-1234/PROJ-123, ticket details, issue details, status, assignee,
+  comments, transitions, labels, sprint, attachments, or JQL. Interact with Jira
+  Server/Data Center only through the bundled scripts/jira-cli wrapper.
 ---
 
 # Jira CLI
@@ -19,12 +21,37 @@ Use `jira-cli` to interact with a self-hosted Jira Server/Data Center instance v
 
 ## When To Use
 
+- The user mentions Jira, a Jira ticket, or an issue key such as `MCD-1234`.
 - The user asks to read, search, or inspect Jira issues.
 - The user asks to create or update a Jira issue.
 - The user asks to transition an issue to a different status.
 - The user asks to link two Jira issues.
 - The user asks to add or read comments on an issue.
 - The user asks to validate Jira config or debug connectivity.
+
+## Trigger Examples
+
+Use this skill for requests like:
+
+- "Pull the issue details of MCD-5838"
+- "What is the status of MCD-1234?"
+- "Show comments on this Jira ticket"
+- "Find Jira issues assigned to me"
+- "Move MCD-1234 to In Progress"
+- "Add a comment to MCD-1234"
+
+## First Action
+
+When a Jira issue key is present, use this skill immediately. Do not look for app
+connectors or call Jira directly first. Run:
+
+```bash
+scripts/jira-cli --project-root /path/to/repo --format json get-issue ISSUE-KEY
+```
+
+If the current repo has no `.agents/jira-cli/jira.toml`, try nearby configured
+project roots before giving up. In Marcando workspaces, sibling repos often share
+the same Jira instance and may already have `.agents/jira-cli` configured.
 
 ## Setup
 
